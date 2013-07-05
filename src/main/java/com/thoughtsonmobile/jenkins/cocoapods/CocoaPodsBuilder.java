@@ -118,13 +118,16 @@ public class CocoaPodsBuilder extends Builder {
       final EnvVars env = build.getEnvironment(listener);
       env.putAll(build.getBuildVariables());
 
-      final ArgumentListBuilder args = new ArgumentListBuilder();
+      final ArgumentListBuilder argsTouch = new ArgumentListBuilder();
+      final ArgumentListBuilder argsRemove = new ArgumentListBuilder();
 
       if (cleanPods) {
-        args.addTokenized("touch Pods");
-        args.addTokenized("rm -r -f Pods");
+        argsTouch.addTokenized("touch Pods");
+        argsRemove.addTokenized("rm -r -f Pods");
       }
 
+      final ArgumentListBuilder args = new ArgumentListBuilder();
+      
       args.addTokenized("pod repo update");
 
       final ArgumentListBuilder args2 = new ArgumentListBuilder();
@@ -134,14 +137,23 @@ public class CocoaPodsBuilder extends Builder {
 	      args2.add("--verbose");
       }
 
+	  int resultTouch = 0;
+      int resultRemove = 0;
+      if (cleanPods) {
+      resultTouch = launcher.decorateFor(build.getBuiltOn()).launch().cmds(argsTouch).envs(env)
+                 .stdout(listener).pwd(build.getModuleRoot()).join();
+    
+      resultRemove = launcher.decorateFor(build.getBuiltOn()).launch().cmds(argsRemove).envs(env)
+                 .stdout(listener).pwd(build.getModuleRoot()).join();
+            }
+            
       final int resultInstall =
         launcher.decorateFor(build.getBuiltOn()).launch().cmds(args).envs(env)
                  .stdout(listener).pwd(build.getModuleRoot()).join();
       final int resultUpdate  =
         launcher.decorateFor(build.getBuiltOn()).launch().cmds(args2).envs(env)
                  .stdout(listener).pwd(build.getModuleRoot()).join();
-
-      return (resultInstall == 0) && (resultUpdate == 0);
+	    return (resultTouch == 0) && (resultRemove == 0) && (resultInstall == 0) && (resultUpdate == 0);
     } catch (final IOException e) {
       e.printStackTrace();
     } catch (final InterruptedException e) {
