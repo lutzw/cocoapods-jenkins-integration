@@ -72,12 +72,12 @@ public class CocoaPodsBuilder extends Builder {
   /**
    * if true &quot;Pods&quot; folder will be removed before refreshing.
    */
-  private final boolean cleanPods;
+  public final boolean cleanPods;
 
   /**
    * if {@code true} cocoapods will be verbose in the log trail.
    */
-  private final boolean verbose;
+  public final boolean verbose;
 
 /**
    * Creates a new CocoaPodsBuilder object.
@@ -86,8 +86,8 @@ public class CocoaPodsBuilder extends Builder {
    *   be removed before refreshing pods
    */
   @DataBoundConstructor
-  public CocoaPodsBuilder(final boolean cleanpods, final boolean verbose) {
-    cleanPods = cleanpods;
+  public CocoaPodsBuilder(final boolean cleanPods, final boolean verbose) {
+    this.cleanPods = cleanPods;
     this.verbose = verbose;
   }
 
